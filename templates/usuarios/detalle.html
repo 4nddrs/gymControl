@@ -1,0 +1,115 @@
+{% extends "base.html" %}
+
+{% block title %}{{ usuario.nombre }} {{ usuario.apellido }} - VITO'S GYM{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <h2>👤 Detalle de Usuario</h2>
+    <div style="display: flex; gap: 1rem;">
+        <a href="{{ url_for('usuarios.editar', usuario_id=usuario._id) }}" class="btn btn-primary">✏️ Editar</a>
+        <a href="{{ url_for('usuarios.index') }}" class="btn btn-secondary">← Volver</a>
+    </div>
+</div>
+
+<div class="dashboard-grid">
+    <!-- Información Personal -->
+    <div class="content-section">
+        <h3>📋 Información Personal</h3>
+        <div style="text-align: center; margin-bottom: 1.5rem;">
+            <img src="{{ usuario.foto_url or url_for('fotos.avatar_default') }}" 
+                 alt="{{ usuario.nombre }}"
+                 style="width: 150px; height: 150px; border-radius: 50%; object-fit: cover; border: 4px solid var(--primary-color);">
+        </div>
+        <table style="width: 100%;">
+            <tr>
+                <td style="padding: 0.5rem; font-weight: bold;">ID:</td>
+                <td style="padding: 0.5rem;">{{ usuario._id }}</td>
+            </tr>
+            <tr>
+                <td style="padding: 0.5rem; font-weight: bold;">Nombre:</td>
+                <td style="padding: 0.5rem;">{{ usuario.nombre }} {{ usuario.apellido }}</td>
+            </tr>
+            {% if usuario.numero_documento %}
+            <tr>
+                <td style="padding: 0.5rem; font-weight: bold;">Documento:</td>
+                <td style="padding: 0.5rem;">{{ usuario.tipo_documento or 'DNI' }}: {{ usuario.numero_documento }}</td>
+            </tr>
+            {% endif %}
+            {% if usuario.edad %}
+            <tr>
+                <td style="padding: 0.5rem; font-weight: bold;">Edad:</td>
+                <td style="padding: 0.5rem;">{{ usuario.edad }} años</td>
+            </tr>
+            {% endif %}
+            <tr>
+                <td style="padding: 0.5rem; font-weight: bold;">Departamento:</td>
+                <td style="padding: 0.5rem;">{{ usuario.departamento_nombre or 'N/A' }}</td>
+            </tr>
+            <tr>
+                <td style="padding: 0.5rem; font-weight: bold;">Estado:</td>
+                <td style="padding: 0.5rem;">
+                    {% if usuario.activo %}
+                    <span style="background: var(--success-color); color: white; padding: 0.25rem 0.75rem; border-radius: 4px; font-size: 0.85rem;">ACTIVO</span>
+                    {% else %}
+                    <span style="background: var(--gray-300); color: var(--text-color); padding: 0.25rem 0.75rem; border-radius: 4px; font-size: 0.85rem;">INACTIVO</span>
+                    {% endif %}
+                </td>
+            </tr>
+        </table>
+    </div>
+
+    <!-- Membresías -->
+    <div class="content-section">
+        <h3>💳 Membresías</h3>
+        {% if membresias %}
+        <div style="display: flex; flex-direction: column; gap: 0.75rem;">
+            {% for membresia in membresias[:3] %}
+            <div style="padding: 0.75rem; background: var(--light-color); border-radius: 4px; border-left: 3px solid {% if membresia.vigente %}var(--success-color){% else %}var(--danger-color){% endif %};">
+                <strong>{{ membresia.plan_nombre or 'Plan' }}</strong><br>
+                <small>{{ membresia.fecha_inicio.strftime('%d/%m/%Y') if membresia.fecha_inicio else 'N/A' }} - {{ membresia.fecha_fin.strftime('%d/%m/%Y') if membresia.fecha_fin else 'N/A' }}</small><br>
+                <small style="color: {% if membresia.vigente %}var(--success-color){% else %}var(--danger-color){% endif %};">
+                    {% if membresia.vigente %}✓ Vigente{% else %}✗ Vencida{% endif %}
+                </small>
+            </div>
+            {% endfor %}
+        </div>
+        {% else %}
+        <p style="color: var(--text-light); text-align: center; padding: 2rem 0;">No tiene membresías registradas</p>
+        {% endif %}
+    </div>
+
+    <!-- Asistencias Recientes -->
+    <div class="content-section">
+        <h3>📋 Asistencias Recientes</h3>
+        {% if asistencias %}
+        <div style="display: flex; flex-direction: column; gap: 0.5rem;">
+            {% for asistencia in asistencias[:5] %}
+            <div style="padding: 0.5rem; background: var(--light-color); border-radius: 4px;">
+                <strong>{{ asistencia.fecha.strftime('%d/%m/%Y %H:%M') if asistencia.fecha else 'N/A' }}</strong><br>
+                <small>{{ asistencia.metodo_registro or asistencia.tipo_acceso or 'Manual' }}</small>
+            </div>
+            {% endfor %}
+        </div>
+        {% else %}
+        <p style="color: var(--text-light); text-align: center; padding: 2rem 0;">Sin asistencias registradas</p>
+        {% endif %}
+    </div>
+
+    <!-- Plantillas Biométricas -->
+    <div class="content-section">
+        <h3>🔐 Biometría</h3>
+        {% if plantillas %}
+        <div style="display: flex; flex-direction: column; gap: 0.5rem;">
+            {% for plantilla in plantillas %}
+            <div style="padding: 0.5rem; background: var(--light-color); border-radius: 4px;">
+                <strong>{{ plantilla.tipo_plantilla or 'Plantilla' }}</strong><br>
+                <small>Calidad: {{ plantilla.calidad or 0 }}%</small>
+            </div>
+            {% endfor %}
+        </div>
+        {% else %}
+        <p style="color: var(--text-light); text-align: center; padding: 2rem 0;">Sin plantillas biométricas</p>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

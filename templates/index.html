@@ -1,0 +1,83 @@
+{% extends "base.html" %}
+
+{% block title %}Dashboard - VITO'S GYM{% endblock %}
+
+{% block content %}
+<div class="dashboard">
+    <header class="page-header">
+        <h2>📊 Dashboard</h2>
+        <p>Resumen general del gimnasio</p>
+    </header>
+
+    <!-- Tarjetas de estadísticas -->
+    <div class="stats-grid">
+        <div class="stat-card">
+            <div class="stat-icon">👥</div>
+            <div class="stat-info">
+                <h3>{{ stats.total_usuarios }}</h3>
+                <p>Usuarios Totales</p>
+            </div>
+        </div>
+
+        <div class="stat-card">
+            <div class="stat-icon">✅</div>
+            <div class="stat-info">
+                <h3>{{ stats.usuarios_activos }}</h3>
+                <p>Usuarios Activos</p>
+            </div>
+        </div>
+
+        <div class="stat-card">
+            <div class="stat-icon">💳</div>
+            <div class="stat-info">
+                <h3>{{ stats.membresias_vigentes }}</h3>
+                <p>Membresías Vigentes</p>
+            </div>
+        </div>
+
+        <div class="stat-card">
+            <div class="stat-icon">�</div>
+            <div class="stat-info">
+                <h3>{{ stats.asistencias_hoy }}</h3>
+                <p>Asistencias Hoy</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Secciones adicionales -->
+    <div class="dashboard-grid">
+        <div class="dashboard-section">
+            <h3>⚡ Acciones Rápidas</h3>
+            <div class="quick-actions">
+                <a href="{{ url_for('usuarios_redirect') }}" class="action-btn">
+                    <span>👤</span> Nuevo Usuario
+                </a>
+                <a href="{{ url_for('membresias_redirect') }}" class="action-btn">
+                    <span>💳</span> Nueva Membresía
+                </a>
+                <a href="{{ url_for('asistencias_redirect') }}" class="action-btn">
+                    <span>📊</span> Registrar Asistencia
+                </a>
+                <a href="{{ url_for('reportes') }}" class="action-btn">
+                    <span>📈</span> Ver Reportes
+                </a>
+            </div>
+        </div>
+
+        <div class="dashboard-section">
+            <h3>📅 Información del Sistema</h3>
+            <div class="info-list">
+                <div class="info-item">
+                    <strong>Base de Datos:</strong> Conectada ✓
+                </div>
+                <div class="info-item">
+                    <strong>Servidor:</strong> Activo
+                </div>
+                <div class="info-item">
+                    <strong>Estado:</strong> Operativo
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

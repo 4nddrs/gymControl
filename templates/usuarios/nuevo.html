@@ -1,0 +1,129 @@
+{% extends "base.html" %}
+
+{% block title %}Nuevo Usuario - VITO'S GYM{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <h2>➕ Nuevo Usuario</h2>
+    <a href="{{ url_for('usuarios.index') }}" class="btn btn-secondary">← Volver</a>
+</div>
+
+<div class="content-section" style="max-width: 800px; margin: 0 auto;">
+    <form method="POST" action="{{ url_for('usuarios.nuevo') }}">
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem;">
+            <!-- Nombre -->
+            <div>
+                <label style="display: block; margin-bottom: 0.5rem; font-weight: bold;">
+                    Nombre <span style="color: var(--danger-color);">*</span>
+                </label>
+                <input type="text" 
+                       name="nombre" 
+                       value="{{ data.nombre if data else '' }}" 
+                       required
+                       style="width: 100%; padding: 0.75rem; border: 2px solid var(--border-color); border-radius: 6px; font-size: 1rem;">
+            </div>
+
+            <!-- Apellido -->
+            <div>
+                <label style="display: block; margin-bottom: 0.5rem; font-weight: bold;">
+                    Apellido <span style="color: var(--danger-color);">*</span>
+                </label>
+                <input type="text" 
+                       name="apellido" 
+                       value="{{ data.apellido if data else '' }}" 
+                       required
+                       style="width: 100%; padding: 0.75rem; border: 2px solid var(--border-color); border-radius: 6px; font-size: 1rem;">
+            </div>
+
+            <!-- Tipo Documento -->
+            <div>
+                <label style="display: block; margin-bottom: 0.5rem; font-weight: bold;">
+                    Tipo de Documento
+                </label>
+                <select name="tipo_documento" 
+                        style="width: 100%; padding: 0.75rem; border: 2px solid var(--border-color); border-radius: 6px; font-size: 1rem;">
+                    <option value="DNI">DNI</option>
+                    <option value="Pasaporte">Pasaporte</option>
+                    <option value="Cédula">Cédula</option>
+                </select>
+            </div>
+
+            <!-- Número Documento -->
+            <div>
+                <label style="display: block; margin-bottom: 0.5rem; font-weight: bold;">
+                    Número de Documento
+                </label>
+                <input type="text" 
+                       name="numero_documento" 
+                       value="{{ data.numero_documento if data else '' }}"
+                       style="width: 100%; padding: 0.75rem; border: 2px solid var(--border-color); border-radius: 6px; font-size: 1rem;">
+            </div>
+
+            <!-- Fecha Nacimiento -->
+            <div>
+                <label style="display: block; margin-bottom: 0.5rem; font-weight: bold;">
+                    Fecha de Nacimiento
+                </label>
+                <input type="date" 
+                       name="fecha_nacimiento"
+                       style="width: 100%; padding: 0.75rem; border: 2px solid var(--border-color); border-radius: 6px; font-size: 1rem;">
+            </div>
+
+            <!-- Email -->
+            <div>
+                <label style="display: block; margin-bottom: 0.5rem; font-weight: bold;">
+                    Email
+                </label>
+                <input type="email" 
+                       name="email" 
+                       value="{{ data.email if data else '' }}"
+                       style="width: 100%; padding: 0.75rem; border: 2px solid var(--border-color); border-radius: 6px; font-size: 1rem;">
+            </div>
+
+            <!-- Teléfono -->
+            <div>
+                <label style="display: block; margin-bottom: 0.5rem; font-weight: bold;">
+                    Teléfono
+                </label>
+                <input type="tel" 
+                       name="telefono" 
+                       value="{{ data.telefono if data else '' }}"
+                       style="width: 100%; padding: 0.75rem; border: 2px solid var(--border-color); border-radius: 6px; font-size: 1rem;">
+            </div>
+
+            <!-- Dirección -->
+            <div>
+                <label style="display: block; margin-bottom: 0.5rem; font-weight: bold;">
+                    Dirección
+                </label>
+                <input type="text" 
+                       name="direccion" 
+                       value="{{ data.direccion if data else '' }}"
+                       style="width: 100%; padding: 0.75rem; border: 2px solid var(--border-color); border-radius: 6px; font-size: 1rem;">
+            </div>
+
+            <!-- Estado -->
+            <div style="grid-column: 1 / -1;">
+                <label style="display: flex; align-items: center; gap: 0.5rem; cursor: pointer;">
+                    <input type="checkbox" 
+                           name="activo" 
+                           value="true"
+                           checked
+                           style="width: 20px; height: 20px; cursor: pointer;">
+                    <span style="font-weight: bold;">Usuario Activo</span>
+                </label>
+            </div>
+        </div>
+
+        <!-- Botones -->
+        <div style="margin-top: 2rem; display: flex; gap: 1rem; justify-content: flex-end;">
+            <a href="{{ url_for('usuarios.index') }}" class="btn btn-secondary">
+                Cancelar
+            </a>
+            <button type="submit" class="btn btn-primary">
+                💾 Crear Usuario
+            </button>
+        </div>
+    </form>
+</div>
+{% endblock %}

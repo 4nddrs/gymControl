@@ -1,0 +1,111 @@
+{% extends "base.html" %}
+
+{% block title %}{{ titulo }} - VITO'S GYM{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <h2>🔐 {{ titulo }}</h2>
+    <a href="{{ url_for('biometria.estadisticas') }}" class="btn btn-secondary">📊 Estadísticas</a>
+</div>
+
+<!-- Filtros por tipo -->
+<div class="content-section" style="margin-bottom: 1.5rem;">
+    <div style="display: flex; gap: 1rem; flex-wrap: wrap;">
+        <a href="{{ url_for('biometria.index') }}" 
+           class="btn {% if not tipo %}btn-primary{% else %}btn-secondary{% endif %}">
+            Todas
+        </a>
+        <a href="{{ url_for('biometria.index', tipo='Huella Digital') }}" 
+           class="btn {% if tipo == 'Huella Digital' %}btn-primary{% else %}btn-secondary{% endif %}">
+            👆 Huella Digital
+        </a>
+        <a href="{{ url_for('biometria.index', tipo='Rostro') }}" 
+           class="btn {% if tipo == 'Rostro' %}btn-primary{% else %}btn-secondary{% endif %}">
+            😊 Rostro
+        </a>
+        <a href="{{ url_for('biometria.index', tipo='Iris') }}" 
+           class="btn {% if tipo == 'Iris' %}btn-primary{% else %}btn-secondary{% endif %}">
+            👁️ Iris
+        </a>
+        <a href="{{ url_for('biometria.index', tipo='Voz') }}" 
+           class="btn {% if tipo == 'Voz' %}btn-primary{% else %}btn-secondary{% endif %}">
+            🎤 Voz
+        </a>
+    </div>
+</div>
+
+<!-- Lista de plantillas -->
+<div class="content-section">
+    <div style="margin-bottom: 1rem;">
+        <h3>Total de plantillas: <span style="color: var(--primary-color);">{{ plantillas|length }}</span></h3>
+    </div>
+    
+    <table style="width: 100%; border-collapse: collapse;">
+        <thead>
+            <tr style="border-bottom: 2px solid var(--primary-color); text-align: left;">
+                <th style="padding: 1rem;">Usuario</th>
+                <th style="padding: 1rem;">Tipo</th>
+                <th style="padding: 1rem;">Calidad</th>
+                <th style="padding: 1rem;">Dispositivo</th>
+                <th style="padding: 1rem;">Fecha Registro</th>
+                <th style="padding: 1rem;">Estado</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for plantilla in plantillas %}
+            <tr style="border-bottom: 1px solid var(--border-color);">
+                <td style="padding: 1rem;">
+                    <strong>{{ plantilla.get('usuario_nombre', 'Usuario Desconocido') }}</strong><br>
+                    <small style="color: var(--text-light);">ID: {{ plantilla.get('usuario_id', 'N/A') }}</small>
+                </td>
+                <td style="padding: 1rem;">
+                    {% if plantilla.get('tipo_plantilla') == 'Huella Digital' %}
+                    👆 {{ plantilla.tipo_plantilla }}
+                    {% elif plantilla.get('tipo_plantilla') == 'Rostro' %}
+                    😊 {{ plantilla.tipo_plantilla }}
+                    {% elif plantilla.get('tipo_plantilla') == 'Iris' %}
+                    👁️ {{ plantilla.tipo_plantilla }}
+                    {% elif plantilla.get('tipo_plantilla') == 'Voz' %}
+                    🎤 {{ plantilla.tipo_plantilla }}
+                    {% else %}
+                    {{ plantilla.get('tipo_plantilla', 'N/A') }}
+                    {% endif %}
+                </td>
+                <td style="padding: 1rem;">
+                    {% if plantilla.get('calidad', 0) >= 80 %}
+                    <span style="background: var(--success-color); color: white; padding: 0.25rem 0.75rem; border-radius: 4px; font-size: 0.85rem;">
+                        {{ plantilla.get('calidad', 0) }}%
+                    </span>
+                    {% elif plantilla.get('calidad', 0) >= 50 %}
+                    <span style="background: var(--warning-color); color: white; padding: 0.25rem 0.75rem; border-radius: 4px; font-size: 0.85rem;">
+                        {{ plantilla.get('calidad', 0) }}%
+                    </span>
+                    {% else %}
+                    <span style="background: var(--danger-color); color: white; padding: 0.25rem 0.75rem; border-radius: 4px; font-size: 0.85rem;">
+                        {{ plantilla.get('calidad', 0) }}%
+                    </span>
+                    {% endif %}
+                </td>
+                <td style="padding: 1rem;">{{ plantilla.get('dispositivo', 'N/A') }}</td>
+                <td style="padding: 1rem;">
+                    {{ plantilla.fecha_registro.strftime('%d/%m/%Y %H:%M') if plantilla.get('fecha_registro') else 'N/A' }}
+                </td>
+                <td style="padding: 1rem;">
+                    {% if plantilla.get('template') %}
+                    <span style="background: var(--success-color); color: white; padding: 0.25rem 0.75rem; border-radius: 4px; font-size: 0.85rem;">✓ Con template</span>
+                    {% else %}
+                    <span style="background: var(--gray-300); color: var(--text-color); padding: 0.25rem 0.75rem; border-radius: 4px; font-size: 0.85rem;">✗ Sin template</span>
+                    {% endif %}
+                </td>
+            </tr>
+            {% else %}
+            <tr>
+                <td colspan="6" style="padding: 2rem; text-align: center; color: var(--text-light);">
+                    No se encontraron plantillas biométricas
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}

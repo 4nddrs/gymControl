@@ -1,0 +1,101 @@
+{% extends "base.html" %}
+
+{% block title %}Usuarios - VITO'S GYM{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <h2>👥 Usuarios</h2>
+    <a href="{{ url_for('usuarios.nuevo') }}" class="btn btn-primary">+ Nuevo Usuario</a>
+</div>
+
+<!-- Búsqueda -->
+<div class="content-section" style="margin-bottom: 1.5rem;">
+    <form method="GET" action="{{ url_for('usuarios.index') }}" style="display: flex; gap: 1rem;">
+        <input type="text" 
+               name="search" 
+               value="{{ search }}" 
+               placeholder="Buscar por nombre, apellido o documento..." 
+               style="flex: 1; padding: 0.75rem; border: 2px solid var(--border-color); border-radius: 6px; font-size: 1rem;">
+        <button type="submit" class="btn btn-primary">🔍 Buscar</button>
+        {% if search %}
+        <a href="{{ url_for('usuarios.index') }}" class="btn btn-secondary">Limpiar</a>
+        {% endif %}
+    </form>
+</div>
+
+<!-- Lista de usuarios -->
+<div class="content-section">
+    <table style="width: 100%; border-collapse: collapse;">
+        <thead>
+            <tr style="border-bottom: 2px solid var(--primary-color); text-align: left;">
+                <th style="padding: 1rem;">Foto</th>
+                <th style="padding: 1rem;">ID</th>
+                <th style="padding: 1rem;">Nombre</th>
+                <th style="padding: 1rem;">Documento</th>
+                <th style="padding: 1rem;">Departamento</th>
+                <th style="padding: 1rem;">Estado</th>
+                <th style="padding: 1rem;">Acciones</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for usuario in usuarios %}
+            <tr style="border-bottom: 1px solid var(--border-color);">
+                <td style="padding: 1rem;">
+                    <img src="{{ usuario.foto_url or url_for('fotos.avatar_default') }}" 
+                         alt="{{ usuario.nombre }}"
+                         style="width: 50px; height: 50px; border-radius: 50%; object-fit: cover; border: 2px solid var(--primary-color);">
+                </td>
+                <td style="padding: 1rem;">{{ usuario._id }}</td>
+                <td style="padding: 1rem;">
+                    <strong>{{ usuario.nombre }} {{ usuario.apellido }}</strong>
+                    {% if usuario.edad %}
+                    <br><small style="color: var(--text-light);">{{ usuario.edad }} años</small>
+                    {% endif %}
+                </td>
+                <td style="padding: 1rem;">{{ usuario.numero_documento or 'N/A' }}</td>
+                <td style="padding: 1rem;">{{ usuario.departamento_nombre or 'N/A' }}</td>
+                <td style="padding: 1rem;">
+                    {% if usuario.activo %}
+                    <span style="background: var(--success-color); color: white; padding: 0.25rem 0.75rem; border-radius: 4px; font-size: 0.85rem; font-weight: bold;">ACTIVO</span>
+                    {% else %}
+                    <span style="background: var(--gray-300); color: var(--text-color); padding: 0.25rem 0.75rem; border-radius: 4px; font-size: 0.85rem; font-weight: bold;">INACTIVO</span>
+                    {% endif %}
+                </td>
+                <td style="padding: 1rem;">
+                    <a href="{{ url_for('usuarios.detalle', usuario_id=usuario._id) }}" 
+                       style="color: var(--primary-color); text-decoration: none; margin-right: 1rem;">Ver</a>
+                    <a href="{{ url_for('usuarios.editar', usuario_id=usuario._id) }}" 
+                       style="color: var(--text-light); text-decoration: none;">Editar</a>
+                </td>
+            </tr>
+            {% else %}
+            <tr>
+                <td colspan="7" style="padding: 2rem; text-align: center; color: var(--text-light);">
+                    No se encontraron usuarios
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    
+    <!-- Paginación -->
+    {% if pagination.total_pages > 1 %}
+    <div style="margin-top: 2rem; text-align: center; display: flex; gap: 0.5rem; justify-content: center; align-items: center;">
+        {% if pagination.page > 1 %}
+        <a href="{{ url_for('usuarios.index', page=pagination.page-1, search=search) }}" 
+           class="btn btn-secondary" style="padding: 0.5rem 1rem;">← Anterior</a>
+        {% endif %}
+        
+        <span style="padding: 0.5rem 1rem;">
+            Página {{ pagination.page }} de {{ pagination.total_pages }} 
+            ({{ pagination.total }} usuarios)
+        </span>
+        
+        {% if pagination.page < pagination.total_pages %}
+        <a href="{{ url_for('usuarios.index', page=pagination.page+1, search=search) }}" 
+           class="btn btn-secondary" style="padding: 0.5rem 1rem;">Siguiente →</a>
+        {% endif %}
+    </div>
+    {% endif %}
+</div>
+{% endblock %}
