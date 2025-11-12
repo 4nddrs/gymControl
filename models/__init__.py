@@ -7,6 +7,7 @@ from .membresia import Membresia
 from .asistencia import Asistencia
 from .plantilla_biometrica import PlantillaBiometrica
 from .plan import Plan
+from .departamento import Departamento
 
 __all__ = [
     'db_manager',
@@ -14,5 +15,6 @@ __all__ = [
     'Membresia',
     'Asistencia',
     'PlantillaBiometrica',
-    'Plan'
+    'Plan',
+    'Departamento'
 ]

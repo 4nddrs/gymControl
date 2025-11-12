@@ -34,11 +34,12 @@ class Usuario:
             return None
     
     def search(self, query):
-        """Buscar usuarios por nombre, apellido o documento"""
+        """Buscar usuarios por nombre, apellido, código, documento o email"""
         filtro = {
             '$or': [
                 {'nombre': {'$regex': query, '$options': 'i'}},
                 {'apellido': {'$regex': query, '$options': 'i'}},
+                {'codigo': {'$regex': query, '$options': 'i'}},
                 {'numero_documento': {'$regex': query, '$options': 'i'}},
                 {'email': {'$regex': query, '$options': 'i'}}
             ]
@@ -51,10 +52,13 @@ class Usuario:
             '_id': data.get('id'),
             'nombre': data.get('nombre'),
             'apellido': data.get('apellido'),
+            'codigo': data.get('codigo', ''),  # Nuevo campo código alfanumérico
             'departamento_id': data.get('departamento_id'),
             'departamento_nombre': data.get('departamento_nombre'),
             'genero': data.get('genero'),
             'fecha_nacimiento': data.get('fecha_nacimiento'),
+            'fecha_inicio': data.get('fecha_inicio'),  # Nueva fecha inicio membresía
+            'fecha_fin': data.get('fecha_fin'),  # Nueva fecha fin membresía
             'celular': data.get('celular'),
             'email': data.get('email'),
             'tipo_documento': data.get('tipo_documento'),
@@ -107,3 +111,39 @@ class Usuario:
             {'$sort': {'total': -1}}
         ]
         return list(self.collection.aggregate(pipeline))
+    
+    def get_vigentes(self):
+        """Obtener usuarios con membresía vigente"""
+        return list(self.collection.find({
+            'fecha_fin': {'$gte': datetime.now()},
+            'activo': True
+        }).sort('fecha_fin', 1))
+    
+    def get_vencidos(self):
+        """Obtener usuarios con membresía vencida"""
+        return list(self.collection.find({
+            'fecha_fin': {'$lt': datetime.now()},
+            'activo': True
+        }).sort('fecha_fin', -1))
+    
+    def get_sin_membresia(self):
+        """Obtener usuarios sin membresía (fecha_fin es None o no existe)"""
+        return list(self.collection.find({
+            '$or': [
+                {'fecha_fin': None},
+                {'fecha_fin': {'$exists': False}}
+            ],
+            'activo': True
+        }).sort('nombre', 1))
+    
+    def get_proximos_vencer(self, dias=7):
+        """Obtener usuarios con membresía próxima a vencer"""
+        from datetime import timedelta
+        fecha_limite = datetime.now() + timedelta(days=dias)
+        return list(self.collection.find({
+            'fecha_fin': {
+                '$gte': datetime.now(),
+                '$lte': fecha_limite
+            },
+            'activo': True
+        }).sort('fecha_fin', 1))

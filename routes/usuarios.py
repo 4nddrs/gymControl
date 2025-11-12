@@ -2,10 +2,11 @@
 Rutas para gestión de usuarios
 """
 from flask import Blueprint, render_template, request, jsonify, redirect, url_for, flash, send_file
-from models import Usuario, db_manager
+from models import Usuario, Departamento, db_manager
 from utils.fotos import get_foto_path, get_foto_url, tiene_foto
 from utils.helpers import format_date, calcular_edad
 from datetime import datetime
+from bson import ObjectId
 
 usuarios_bp = Blueprint('usuarios', __name__, url_prefix='/usuarios')
 
@@ -89,6 +90,21 @@ def nuevo():
             if data.get('fecha_nacimiento'):
                 data['fecha_nacimiento'] = datetime.strptime(data['fecha_nacimiento'], '%Y-%m-%d')
             
+            # Convertir fecha inicio membresía
+            if data.get('fecha_inicio'):
+                data['fecha_inicio'] = datetime.strptime(data['fecha_inicio'], '%Y-%m-%d')
+            
+            # Convertir fecha fin membresía
+            if data.get('fecha_fin'):
+                data['fecha_fin'] = datetime.strptime(data['fecha_fin'], '%Y-%m-%d')
+            
+            # Obtener nombre del departamento si se seleccionó uno
+            if data.get('departamento_id'):
+                departamento_model = Departamento(db_manager.db)
+                departamento = departamento_model.find_by_id(data['departamento_id'])
+                if departamento:
+                    data['departamento_nombre'] = departamento['nombre']
+            
             usuario_model = Usuario(db_manager.db)
             usuario_id = usuario_model.create(data)
             
@@ -97,9 +113,14 @@ def nuevo():
             
         except Exception as e:
             flash(f'Error al crear usuario: {str(e)}', 'error')
-            return render_template('usuarios/nuevo.html', data=data)
+            departamento_model = Departamento(db_manager.db)
+            return render_template('usuarios/nuevo.html', 
+                                 data=data,
+                                 departamentos=departamento_model.find_all())
     
-    return render_template('usuarios/nuevo.html')
+    departamento_model = Departamento(db_manager.db)
+    return render_template('usuarios/nuevo.html',
+                         departamentos=departamento_model.find_all())
 
 @usuarios_bp.route('/<int:usuario_id>/editar', methods=['GET', 'POST'])
 def editar(usuario_id):
@@ -119,6 +140,21 @@ def editar(usuario_id):
             if data.get('fecha_nacimiento'):
                 data['fecha_nacimiento'] = datetime.strptime(data['fecha_nacimiento'], '%Y-%m-%d')
             
+            # Convertir fecha inicio membresía
+            if data.get('fecha_inicio'):
+                data['fecha_inicio'] = datetime.strptime(data['fecha_inicio'], '%Y-%m-%d')
+            
+            # Convertir fecha fin membresía
+            if data.get('fecha_fin'):
+                data['fecha_fin'] = datetime.strptime(data['fecha_fin'], '%Y-%m-%d')
+            
+            # Obtener nombre del departamento si se seleccionó uno
+            if data.get('departamento_id'):
+                departamento_model = Departamento(db_manager.db)
+                departamento = departamento_model.find_by_id(data['departamento_id'])
+                if departamento:
+                    data['departamento_nombre'] = departamento['nombre']
+            
             usuario_model.update(usuario_id, data)
             
             flash('Usuario actualizado exitosamente', 'success')
@@ -127,7 +163,10 @@ def editar(usuario_id):
         except Exception as e:
             flash(f'Error al actualizar usuario: {str(e)}', 'error')
     
-    return render_template('usuarios/editar.html', usuario=usuario)
+    departamento_model = Departamento(db_manager.db)
+    return render_template('usuarios/editar.html', 
+                         usuario=usuario,
+                         departamentos=departamento_model.find_all())
 
 @usuarios_bp.route('/<int:usuario_id>/eliminar', methods=['POST'])
 def eliminar(usuario_id):

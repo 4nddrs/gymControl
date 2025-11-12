@@ -5,7 +5,34 @@
 {% block content %}
 <div class="page-header">
     <h2>💳 Membresías</h2>
-    <a href="{{ url_for('membresias.nueva') }}" class="btn btn-primary">+ Nueva Membresía</a>
+</div>
+
+<!-- Estadísticas rápidas -->
+<div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; margin-bottom: 1.5rem;">
+    <div class="content-section" style="text-align: center; padding: 1rem;">
+        <div style="font-size: 2rem; font-weight: bold; color: var(--success-color);">
+            {{ stats.vigentes }}
+        </div>
+        <div style="color: var(--text-light); font-size: 0.9rem;">Vigentes</div>
+    </div>
+    <div class="content-section" style="text-align: center; padding: 1rem;">
+        <div style="font-size: 2rem; font-weight: bold; color: #f59e0b;">
+            {{ stats.proximas }}
+        </div>
+        <div style="color: var(--text-light); font-size: 0.9rem;">Por Vencer</div>
+    </div>
+    <div class="content-section" style="text-align: center; padding: 1rem;">
+        <div style="font-size: 2rem; font-weight: bold; color: var(--danger-color);">
+            {{ stats.vencidas }}
+        </div>
+        <div style="color: var(--text-light); font-size: 0.9rem;">Vencidas</div>
+    </div>
+    <div class="content-section" style="text-align: center; padding: 1rem;">
+        <div style="font-size: 2rem; font-weight: bold; color: #6b7280;">
+            {{ stats.sin_membresia }}
+        </div>
+        <div style="color: var(--text-light); font-size: 0.9rem;">Sin Membresía</div>
+    </div>
 </div>
 
 <!-- Filtros -->
@@ -23,23 +50,25 @@
            class="btn {% if filtro == 'vencidas' %}btn-primary{% else %}btn-secondary{% endif %}">
             Vencidas
         </a>
+        <a href="{{ url_for('membresias.index', filtro='sin_membresia') }}" 
+           class="btn {% if filtro == 'sin_membresia' %}btn-primary{% else %}btn-secondary{% endif %}">
+            Sin Membresía
+        </a>
         <a href="{{ url_for('membresias.index', filtro='proximas', dias=7) }}" 
            class="btn {% if filtro == 'proximas' %}btn-primary{% else %}btn-secondary{% endif %}">
             Próximas a vencer
         </a>
-        <a href="{{ url_for('membresias.reportes') }}" class="btn btn-secondary" style="margin-left: auto;">
-            📊 Reportes
-        </a>
     </div>
 </div>
 
-<!-- Lista de membresías -->
+<!-- Lista de usuarios con membresía -->
 <div class="content-section">
     <table style="width: 100%; border-collapse: collapse;">
         <thead>
             <tr style="border-bottom: 2px solid var(--primary-color); text-align: left;">
                 <th style="padding: 1rem;">Usuario</th>
-                <th style="padding: 1rem;">Plan</th>
+                <th style="padding: 1rem;">Código</th>
+                <th style="padding: 1rem;">Departamento</th>
                 <th style="padding: 1rem;">Fecha Inicio</th>
                 <th style="padding: 1rem;">Fecha Fin</th>
                 <th style="padding: 1rem;">Días Restantes</th>
@@ -48,40 +77,63 @@
             </tr>
         </thead>
         <tbody>
-            {% for membresia in membresias %}
-            <tr style="border-bottom: 1px solid var(--border-color);">
+            {% for usuario in usuarios %}
+            <tr style="border-bottom: 1px solid var(--border-color); cursor: pointer;" 
+                onclick="window.location='{{ url_for('usuarios.editar', usuario_id=usuario._id) }}'">
                 <td style="padding: 1rem;">
-                    <strong>{{ membresia.usuario_nombre }}</strong>
+                    <strong>{{ usuario.nombre }} {{ usuario.apellido }}</strong>
                 </td>
-                <td style="padding: 1rem;">{{ membresia.plan_nombre }}</td>
-                <td style="padding: 1rem;">{{ membresia.fecha_inicio.strftime('%d/%m/%Y') }}</td>
-                <td style="padding: 1rem;">{{ membresia.fecha_fin.strftime('%d/%m/%Y') }}</td>
+                <td style="padding: 1rem;">{{ usuario.get('codigo', '-') }}</td>
+                <td style="padding: 1rem;">{{ usuario.get('departamento_nombre', '-') }}</td>
                 <td style="padding: 1rem;">
-                    {% if membresia.dias_restantes > 0 %}
-                        {{ membresia.dias_restantes }} días
+                    {% if usuario.get('fecha_inicio') %}
+                        {{ usuario.fecha_inicio.strftime('%d/%m/%Y') }}
                     {% else %}
-                        <span style="color: var(--danger-color);">Vencida</span>
+                        -
                     {% endif %}
                 </td>
                 <td style="padding: 1rem;">
-                    {% if membresia.vigente %}
-                    <span style="background: var(--success-color); color: white; padding: 0.25rem 0.75rem; border-radius: 4px; font-size: 0.85rem; font-weight: bold;">VIGENTE</span>
+                    {% if usuario.get('fecha_fin') %}
+                        {{ usuario.fecha_fin.strftime('%d/%m/%Y') }}
                     {% else %}
-                    <span style="background: var(--danger-color); color: white; padding: 0.25rem 0.75rem; border-radius: 4px; font-size: 0.85rem; font-weight: bold;">VENCIDA</span>
+                        -
                     {% endif %}
                 </td>
                 <td style="padding: 1rem;">
-                    <form method="POST" action="{{ url_for('membresias.renovar', membresia_id=membresia._id) }}" style="display: inline;">
-                        <button type="submit" style="background: var(--primary-color); color: white; border: none; padding: 0.5rem 1rem; border-radius: 4px; cursor: pointer;">
-                            🔄 Renovar
-                        </button>
-                    </form>
+                    {% if usuario.dias_restantes is not none %}
+                        {% if usuario.dias_restantes > 0 %}
+                            {{ usuario.dias_restantes }} días
+                        {% else %}
+                            <span style="color: var(--danger-color);">Vencida</span>
+                        {% endif %}
+                    {% else %}
+                        -
+                    {% endif %}
+                </td>
+                <td style="padding: 1rem;">
+                    {% if usuario.estado_membresia == 'vigente' %}
+                    <span style="background: var(--success-color); color: white; padding: 0.25rem 0.75rem; border-radius: 4px; font-size: 0.85rem; font-weight: bold; white-space: nowrap; display: inline-block;">✓ VIGENTE</span>
+                    {% elif usuario.estado_membresia == 'proxima_vencer' %}
+                    <span style="background: #f59e0b; color: white; padding: 0.25rem 0.75rem; border-radius: 4px; font-size: 0.85rem; font-weight: bold; white-space: nowrap; display: inline-block;">⚠️ POR VENCER</span>
+                    {% elif usuario.estado_membresia == 'vencida' %}
+                    <span style="background: var(--danger-color); color: white; padding: 0.25rem 0.75rem; border-radius: 4px; font-size: 0.85rem; font-weight: bold; white-space: nowrap; display: inline-block;">✗ VENCIDA</span>
+                    {% else %}
+                    <span style="background: #6b7280; color: white; padding: 0.25rem 0.75rem; border-radius: 4px; font-size: 0.85rem; font-weight: bold; white-space: nowrap; display: inline-block;">○ SIN MEMBRESÍA</span>
+                    {% endif %}
+                </td>
+                <td style="padding: 1rem;">
+                    <a href="{{ url_for('usuarios.editar', usuario_id=usuario._id) }}" 
+                       class="btn btn-primary" 
+                       style="display: inline-block; padding: 0.5rem 1rem; text-decoration: none;"
+                       onclick="event.stopPropagation();">
+                        ✏️ Editar
+                    </a>
                 </td>
             </tr>
             {% else %}
             <tr>
-                <td colspan="7" style="padding: 2rem; text-align: center; color: var(--text-light);">
-                    No se encontraron membresías
+                <td colspan="8" style="padding: 2rem; text-align: center; color: var(--text-light);">
+                    No se encontraron usuarios
                 </td>
             </tr>
             {% endfor %}

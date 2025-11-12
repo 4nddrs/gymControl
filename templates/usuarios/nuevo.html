@@ -35,6 +35,34 @@
                        style="width: 100%; padding: 0.75rem; border: 2px solid var(--border-color); border-radius: 6px; font-size: 1rem;">
             </div>
 
+            <!-- Código -->
+            <div>
+                <label style="display: block; margin-bottom: 0.5rem; font-weight: bold;">
+                    Código
+                </label>
+                <input type="text" 
+                       name="codigo" 
+                       value="{{ data.codigo if data else '' }}" 
+                       placeholder="Ej: ABC123"
+                       style="width: 100%; padding: 0.75rem; border: 2px solid var(--border-color); border-radius: 6px; font-size: 1rem;">
+            </div>
+
+            <!-- Departamento -->
+            <div>
+                <label style="display: block; margin-bottom: 0.5rem; font-weight: bold;">
+                    Departamento
+                </label>
+                <select name="departamento_id" 
+                        style="width: 100%; padding: 0.75rem; border: 2px solid var(--border-color); border-radius: 6px; font-size: 1rem;">
+                    <option value="">Seleccionar...</option>
+                    {% for depto in departamentos %}
+                    <option value="{{ depto._id }}" {% if data and data.departamento_id == depto._id|string %}selected{% endif %}>
+                        {{ depto.nombre }}
+                    </option>
+                    {% endfor %}
+                </select>
+            </div>
+
             <!-- Tipo Documento -->
             <div>
                 <label style="display: block; margin-bottom: 0.5rem; font-weight: bold;">
@@ -69,6 +97,20 @@
                        style="width: 100%; padding: 0.75rem; border: 2px solid var(--border-color); border-radius: 6px; font-size: 1rem;">
             </div>
 
+            <!-- Género -->
+            <div>
+                <label style="display: block; margin-bottom: 0.5rem; font-weight: bold;">
+                    Género
+                </label>
+                <select name="genero" 
+                        style="width: 100%; padding: 0.75rem; border: 2px solid var(--border-color); border-radius: 6px; font-size: 1rem;">
+                    <option value="">Seleccionar...</option>
+                    <option value="M" {% if data and data.genero == 'M' %}selected{% endif %}>Masculino</option>
+                    <option value="F" {% if data and data.genero == 'F' %}selected{% endif %}>Femenino</option>
+                    <option value="Otro" {% if data and data.genero == 'Otro' %}selected{% endif %}>Otro</option>
+                </select>
+            </div>
+
             <!-- Email -->
             <div>
                 <label style="display: block; margin-bottom: 0.5rem; font-weight: bold;">
@@ -86,13 +128,35 @@
                     Teléfono
                 </label>
                 <input type="tel" 
-                       name="telefono" 
-                       value="{{ data.telefono if data else '' }}"
+                       name="celular" 
+                       value="{{ data.celular if data else '' }}"
+                       style="width: 100%; padding: 0.75rem; border: 2px solid var(--border-color); border-radius: 6px; font-size: 1rem;">
+            </div>
+
+            <!-- Fecha Inicio Membresía -->
+            <div>
+                <label style="display: block; margin-bottom: 0.5rem; font-weight: bold;">
+                    Fecha Inicio Membresía
+                </label>
+                <input type="date" 
+                       name="fecha_inicio"
+                       value="{{ data.fecha_inicio if data else '' }}"
+                       style="width: 100%; padding: 0.75rem; border: 2px solid var(--border-color); border-radius: 6px; font-size: 1rem;">
+            </div>
+
+            <!-- Fecha Fin Membresía -->
+            <div>
+                <label style="display: block; margin-bottom: 0.5rem; font-weight: bold;">
+                    Fecha Fin Membresía
+                </label>
+                <input type="date" 
+                       name="fecha_fin"
+                       value="{{ data.fecha_fin if data else '' }}"
                        style="width: 100%; padding: 0.75rem; border: 2px solid var(--border-color); border-radius: 6px; font-size: 1rem;">
             </div>
 
             <!-- Dirección -->
-            <div>
+            <div style="grid-column: 1 / -1;">
                 <label style="display: block; margin-bottom: 0.5rem; font-weight: bold;">
                     Dirección
                 </label>
